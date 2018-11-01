@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-header></v-header>
+    <v-header v-bind:seller='seller'></v-header>
     <div class="tab border-1px">
         <div class="tab-item"><router-link to="/goods">商品</router-link></div>
         <div class="tab-item"><router-link to="/ratings">评论</router-link></div>
@@ -15,12 +15,21 @@
 
 <script>
   import Header from 'components/header/header'
+  const ERR_OK = 0
   export default {
     name: 'App',
     data () {
       return {
-
+         seller: {}
       }
+    },
+    created () {
+      this.$http.get('/api/seller').then((response) => {
+        response = response.body
+        if (response.errno === ERR_OK) {
+          this.seller = response.data
+        }
+      })
     },
     components: {
       'v-header': Header
@@ -44,5 +53,4 @@
        color:rgb(77,85,93)
        &.active
         color :rgb(240,20,20)
-
 </style>
