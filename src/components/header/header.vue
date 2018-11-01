@@ -17,23 +17,62 @@
           <span class="text">{{ seller.supports[0].description }}</span>
         </div>
       </div>
-      <div v-if="seller.supports" class="support-count">
+      <div v-if="seller.supports" class="support-count" @click="showDetail">
         <span class="count">{{seller.supports.length}}个</span>
         <i class="icon icon-keyboard_arrow_right"></i>
       </div>
     </div>
-    <div class="bullentin-wrapper">
+    <div class="bullentin-wrapper" @click="showDetail">
       <span class="bullentin-title"></span><span class="bullentin-text">{{ seller.bulletin }}</span>
       <i class="icon icon-keyboard_arrow_right"></i>
     </div>
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
     </div>
+
+    <transition name="fade">
+    <div class="detail" v-show="detailShow">
+      <div class="detail-wrapper">
+        <div class="detail-main">
+          <div class="name">{{ seller.name }}</div>
+          <div class="star-wrapper">
+            <star :size="48" :score="seller.score"></star>
+          </div>
+         <div class="title">
+           <div class="line"></div>
+           <div class="text">优惠信息</div>
+           <div class="line"></div>
+         </div>
+         <ul v-if="seller.supports" class="supports">
+          <li class="support-item" v-for="support in seller.supports">
+            <span class="icon" :class="classMap[support.type]"></span>
+            <span class="text">{{ support.description }}</span>
+          </li>
+         </ul>
+          <div class="title">
+            <div class="line"></div>
+            <div class="text">商家公告</div>
+            <div class="line"></div>
+          </div>
+
+          <div class="bulletin">
+            <div class="text">{{ seller.bulletin }}</div>
+          </div>
+
+        </div>
+      </div>
+      <div class="detail-close" @click="hideDetail">
+        <i class="icon icon-close"></i>
+      </div>
+    </div>
+    </transition>
+
   </div>
 
 </template>
 
 <script>
+  import star from '../../components/star/star'
   export default {
     name: 'Header',
     props: {
@@ -41,12 +80,26 @@
         type: Object
       }
     },
+    components: {
+      star
+    },
     created () {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee']
     },
     data () {
-      return {}
-    }
+      return {
+        detailShow: false
+      }
+    },
+    methods: {
+      showDetail () {
+        this.detailShow =  true
+      },
+      hideDetail () {
+        this.detailShow =  false
+      }
+    },
+
   }
 
 </script>
@@ -84,7 +137,6 @@
             font-weight:bold
             line-height 18px
             margin-left:6px
-
         .description
           margin-bottom: 10px
           font-size:12px
@@ -142,14 +194,15 @@
         bg-image('bulletin')
         background-size:22px 12px
         background-repeat:no-repeat
-      .bullentin-title
+        vertical-align:middle
+      .bullentin-text
         font-size:10px;
         margin:0 4px
       .icon-keyboard_arrow_right
         position:absolute
         right:12px
-        font-size:10px
-        top:0px
+        font-size: 10px
+        top: 0px
     .background
       position:absolute
       top:0
@@ -159,4 +212,92 @@
       width: 100%
       height:100%
       filter:blur(10px)
+    .detail
+      position: fixed
+      z-index: 1000
+      top:0
+      left:0
+      height: 100%
+      width: 100%
+      background : rgba(7,17,27,0.5)
+      overflow :auto
+      backdrop-filter: blur(10px)
+      &.fade-enter-active, .fade-leave-active
+        transition: opacity .5s;
+      &.fade-enter, .fade-leave
+        opacity: 0;
+        background :rgba(7,17,27,0)
+      .detail-wrapper
+        min-height: 100%
+        width: 100%
+
+        .detail-main
+          margin-top:64px
+          padding-bottom: 64px
+          .name
+            font-size:16px
+            line-height: 16px
+            text-align:center
+          .star-wrapper
+            text-align:center
+            margin:16px auto 28px
+          .title
+            display: flex
+            width:80%
+            margin:28px auto 24px
+            .line
+             flex :1
+             border-bottom 1px solid rgba(255,255,255,0.2)
+             position :relative
+             top: -6px
+            .text
+              text-align: center
+              font-size: 14px
+              font-weight:700
+              padding:0 12px
+          .supports
+            width: 80%
+            margin:0 auto
+            .support-item
+              padding:0 12px
+              margin-bottom:12px
+              font-size:0
+              &:last-child
+               margin-bottom :0
+              .icon
+                display :inline-block
+                width:16px
+                height:16px
+                margin-right: 6px
+                vertical-align: top
+                background-size:16px 16px
+                background-repeat:no-repeat
+                &.decrease
+                  bg-image('decrease_2')
+                &.discount
+                  bg-image('discount_2')
+                &.guarantee
+                  bg-image('guarantee_2')
+                &.invoice
+                  bg-image('invoice_2')
+                &.special
+                  bg-image('special_2')
+              .text
+                font-size: 12px
+                line-height:16px
+          .bulletin
+            margin:0 auto
+            width: 80%
+            font-size:12px
+            line-height:24px
+            font-weight:200
+            .text
+              padding:0 12px
+      .detail-close
+        margin: -128px auto 0;
+        width:32px
+        height:32px
+        clear :both
+        position:relative
+        font-size: 32px
 </style>
